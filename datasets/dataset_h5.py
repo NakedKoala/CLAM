@@ -74,7 +74,7 @@ class Whole_Slide_Bag(Dataset):
 		hdf5_file = h5py.File(self.file_path, "r")
 		dset = hdf5_file['imgs']
 		for name, value in dset.attrs.items():
-			if name == 'patch_sizes': 
+			if name == 'patch_size': 
 				continue
 			print(name, value)
 
