@@ -116,9 +116,17 @@ class Generic_WSI_Classification_Dataset(Dataset):
 		mask = data['label'].isin(ignore)
 		data = data[~mask]
 		data.reset_index(drop=True, inplace=True)
+
+		def label_str_to_vector(s):
+			ret = [0] * 19
+			s_token = s.split("|")
+			for idx in s_token:
+				ret[int(idx)] = 1
+			return ret 
+			
 		for i in data.index:
-			key = data.loc[i, 'label']
-			data.at[i, 'label'] = label_dict[key]
+			s = data.loc[i, 'label']
+			data.at[i, 'label'] = label_str_to_vector(s)
 
 		return data
 
