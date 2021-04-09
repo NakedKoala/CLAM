@@ -149,7 +149,8 @@ class Whole_Slide_Bag_FP(Dataset):
 	def __getitem__(self, idx):
 		with h5py.File(self.file_path,'r') as hdf5_file:
 			coord = hdf5_file['coords'][idx]
-			patch_size_w, patch_size_h = hdf5_file['patch_sizes'][idx][0], hdf5_file['patch_sizes'][idx][1]
+		
+			patch_size_w, patch_size_h = hdf5_file['coords'].attrs['patch_size'][idx][0], hdf5_file['coords'].attrs['patch_size'][idx][1]
 		img = self.wsi.read_region(coord, self.patch_level, (patch_size_w, patch_size_h)).convert('RGB')
 
 		if self.target_patch_size is not None:
