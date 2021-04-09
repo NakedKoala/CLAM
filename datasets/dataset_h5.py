@@ -141,6 +141,8 @@ class Whole_Slide_Bag_FP(Dataset):
 		hdf5_file = h5py.File(self.file_path, "r")
 		dset = hdf5_file['coords']
 		for name, value in dset.attrs.items():
+			if name == 'patch_size': 
+				continue
 			print(name, value)
 
 		print('\nfeature extraction settings')
