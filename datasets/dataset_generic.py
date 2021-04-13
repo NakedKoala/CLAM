@@ -41,6 +41,7 @@ class Generic_WSI_Classification_Dataset(Dataset):
 		patient_strat=False,
 		label_col = None,
 		patient_voting = 'max',
+		hpa=False
 		):
 		"""
 		Args:
@@ -51,6 +52,7 @@ class Generic_WSI_Classification_Dataset(Dataset):
 			label_dict (dict): Dictionary with key, value pairs for converting str labels to int
 			ignore (list): List containing class labels to ignore
 		"""
+		self.hpa = hpa
 		self.label_dict = label_dict
 		self.num_classes = len(set(self.label_dict.values()))
 		self.seed = seed
@@ -123,10 +125,14 @@ class Generic_WSI_Classification_Dataset(Dataset):
 			for idx in s_token:
 				ret[int(idx)] = 1
 			return ret 
-			
+
 		for i in data.index:
 			s = data.loc[i, 'label']
-			data.at[i, 'label'] = label_str_to_vector(s)
+			
+			if self.hpa:
+				data.at[i, 'label'] = label_str_to_vector(s)
+			else:
+				data.at[i, 'label'] = label_dict[key]
 
 		return data
 
