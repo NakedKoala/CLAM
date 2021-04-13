@@ -66,7 +66,7 @@ class Generic_WSI_Classification_Dataset(Dataset):
 
 		slide_data = pd.read_csv(csv_path)
 		slide_data = self.filter_df(slide_data, filter_dict)
-		slide_data = self.df_prep(slide_data, self.label_dict, ignore, self.label_col)
+		slide_data = self.df_prep(slide_data, self.label_dict, ignore, self.label_col, self.hpa)
 
 		###shuffle data
 		if shuffle:
@@ -111,7 +111,7 @@ class Generic_WSI_Classification_Dataset(Dataset):
 		self.patient_data = {'case_id':patients, 'label':np.array(patient_labels)}
 
 	@staticmethod
-	def df_prep(data, label_dict, ignore, label_col):
+	def df_prep(data, label_dict, ignore, label_col, hpa):
 		if label_col != 'label':
 			data['label'] = data[label_col].copy()
 
@@ -128,8 +128,8 @@ class Generic_WSI_Classification_Dataset(Dataset):
 
 		for i in data.index:
 			s = data.loc[i, 'label']
-			
-			if self.hpa:
+
+			if hpa:
 				data.at[i, 'label'] = label_str_to_vector(s)
 			else:
 				data.at[i, 'label'] = label_dict[key]
