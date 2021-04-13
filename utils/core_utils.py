@@ -117,8 +117,14 @@ def train(datasets, cur, args):
         loss_fn = SmoothTop1SVM(n_classes = args.n_classes)
         if device.type == 'cuda':
             loss_fn = loss_fn.cuda()
-    else:
+    
+    elif args.bag_loss == 'ce':
         loss_fn = nn.CrossEntropyLoss()
+    
+    elif args.bag_loss == 'bce':
+        loss_fn = nn.BCEWithLogitsLoss()
+    else:
+        raise NotImplemented
     print('Done!')
     
     print('\nInit Model...', end=' ')
