@@ -132,6 +132,7 @@ class Generic_WSI_Classification_Dataset(Dataset):
 			if hpa:
 				data.at[i, 'label'] = label_str_to_vector(s)
 			else:
+				key = data.loc[i, 'label']
 				data.at[i, 'label'] = label_dict[key]
 
 		return data
