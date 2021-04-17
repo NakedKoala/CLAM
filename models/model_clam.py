@@ -112,8 +112,32 @@ class CLAM_SB(nn.Module):
     def create_negative_targets(length, device):
         return torch.full((length, ), 0, device=device).long()
     
+
+    def inst_eval(self, A, h, classifier, cut_off_ratio=0.2): 
+        device=h.device
+        if len(A.shape) == 1:
+            A = A.view(1, -1)
+
+        num_instances = A.shape[1]
+        num_sample = int(num_instances * cut_off_ratio)
+        if num_sample < 1:
+            num_sample =  1
+
+        top_p_ids = torch.topk(A, num_sample)[1][-1]
+        top_p = torch.index_select(h, dim=0, index=top_p_ids)
+        top_n_ids = torch.topk(-A, num_sample, dim=1)[1][-1]
+        top_n = torch.index_select(h, dim=0, index=top_n_ids)
+        p_targets = self.create_positive_targets(num_sample, device)
+        n_targets = self.create_negative_targets(num_sample, device)
+
+        all_targets = torch.cat([p_targets, n_targets], dim=0)
+        all_instances = torch.cat([top_p, top_n], dim=0)
+        logits = classifier(all_instances)
+        all_preds = torch.topk(logits, 1, dim = 1)[1].squeeze(1)
+        instance_loss = self.instance_loss_fn(logits, all_targets)
+        return instance_loss, all_preds, all_targets
     #instance-level evaluation for in-the-class attention branch
-    def inst_eval(self, A, h, classifier): 
+    def inst_eval_original(self, A, h, classifier): 
         device=h.device
         if len(A.shape) == 1:
             A = A.view(1, -1)
@@ -228,7 +252,9 @@ class CLAM_MB(CLAM_SB):
             total_inst_loss = 0.0
             all_preds = []
             all_targets = []
-            inst_labels = F.one_hot(label, num_classes=self.n_classes).squeeze() #binarize label
+            # inst_labels = F.one_hot(label, num_classes=self.n_classes).squeeze() #binarize label
+            inst_labels = label.squeeze(0)
+          
             for i in range(len(self.instance_classifiers)):
                 inst_label = inst_labels[i].item()
                 classifier = self.instance_classifiers[i]

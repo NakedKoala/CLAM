@@ -19,12 +19,15 @@ class Accuracy_Logger(object):
     def initialize(self):
         self.data = [{"count": 0, "correct": 0} for i in range(self.n_classes)]
     
-    def log(self, Y_hat, Y):
-        Y_hat = int(Y_hat)
-        Y = int(Y)
-        self.data[Y]["count"] += 1
-        self.data[Y]["correct"] += (Y_hat == Y)
-    
+    def log(self, Y_hat, Y_vec):
+
+        for Y, indicator in enumerate(Y_vec.detach().cpu().numpy().tolist()):
+            Y_hat = int(Y_hat)
+            Y = int(Y)
+            if indicator == 1:
+                self.data[Y]["count"] += 1
+                self.data[Y]["correct"] += (Y_hat == Y)
+
     def log_batch(self, Y_hat, Y):
         Y_hat = np.array(Y_hat).astype(int)
         Y = np.array(Y).astype(int)
@@ -240,11 +243,12 @@ def train_loop_clam(epoch, model, loader, optimizer, n_classes, bag_weight, writ
 
     print('\n')
     for batch_idx, (data, label) in enumerate(loader):
+       
         data, label = data.to(device), label.to(device)
         logits, Y_prob, Y_hat, _, instance_dict = model(data, label=label, instance_eval=True)
 
         acc_logger.log(Y_hat, label)
-        loss = loss_fn(logits, label)
+        loss = loss_fn(logits, label.float())
         loss_value = loss.item()
 
         instance_loss = instance_dict['instance_loss']

@@ -176,7 +176,7 @@ elif args.task == 'task_2_tumor_subtyping':
     if args.model_type in ['clam_sb', 'clam_mb']:
         assert args.subtyping 
 elif args.task == 'hpa':
-    
+
     args.n_classes=19
     dataset = Generic_MIL_Dataset(csv_path = '/content/label_df.csv',
                     data_dir= '/content/feature',
@@ -185,7 +185,8 @@ elif args.task == 'hpa':
                     print_info = True,
                     label_dict = {i:i for i in range(19)},
                     patient_strat= False,
-                    ignore=[])
+                    ignore=[],
+                    hpa=True)
 
 else:
     raise NotImplementedError

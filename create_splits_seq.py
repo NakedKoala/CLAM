@@ -71,7 +71,8 @@ elif args.task == 'hpa':
                     print_info = True,
                     label_dict = {i:i for i in range(19)},
                     patient_strat= False,
-                    ignore=[])
+                    ignore=[],
+                    hpa=True)
 
 
 else:
