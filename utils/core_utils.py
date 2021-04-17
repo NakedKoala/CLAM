@@ -265,7 +265,7 @@ def train_loop_clam(epoch, model, loader, optimizer, n_classes, bag_weight, writ
         train_loss += loss_value
         if (batch_idx + 1) % 20 == 0:
             print('batch {}, loss: {:.4f}, instance_loss: {:.4f}, weighted_loss: {:.4f}, '.format(batch_idx, loss_value, instance_loss_value, total_loss.item()) + 
-                'label: {}, bag_size: {}'.format(label.item(), data.size(0)))
+                'label: {}, bag_size: {}'.format(label, data.size(0)))
 
         error = calculate_error(Y_hat, label)
         train_error += error
